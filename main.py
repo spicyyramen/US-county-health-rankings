@@ -65,8 +65,7 @@ def plot_data(state_data, outfile):
                     height=600,
                     width=800)
     # Adjust map geo options
-    fig.update_geos(showcountries=False, showcoastlines=True,
-                    fitbounds="locations",
+    fig.update_geos(showcountries=False, showcoastlines=True
                     )
 
     fig.write_html(outfile, include_plotlyjs='cdn')
