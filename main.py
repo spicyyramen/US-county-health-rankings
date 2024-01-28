@@ -44,7 +44,7 @@ def clean(data):
     return state_data
 
 
-def plot_data(state_data, outfile):
+def plot_unemployment(state_data, outfile):
     # open counties location file
     with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
         counties = json.load(response)
@@ -56,22 +56,51 @@ def plot_data(state_data, outfile):
                             color_continuous_scale="turbo",
                             range_color=(0, 0.15),
                             scope="usa",
-                                title='<b>Unemployment Rates in the US',
-                            labels={'Raw value':'Unemployment Rate'},
+                                title='<b>Unemployment Rates',
+                            labels={'Raw value':'Rate'},
                                 hover_name = 'State',
                         animation_frame="Year span"
                             )
     fig.update_layout(margin={"r":0,"t":45,"l":0,"b":0},
                     height=600,
-                    width=800)
+                    width=700)
+    fig["layout"].pop("updatemenus")
     # Adjust map geo options
     fig.update_geos(showcountries=False, showcoastlines=True
                     )
 
-    fig.write_html(outfile, include_plotlyjs='cdn')
+    fig.write_html(outfile, include_plotlyjs='cdn', full_html=False)
+
+def plot_crime(state_data, outfile):
+    # open counties location file
+    with urlopen('https://raw.githubusercontent.com/plotly/datasets/master/geojson-counties-fips.json') as response:
+        counties = json.load(response)
+    fig = px.choropleth(state_data.loc[(state_data['State'] != "US") & (state_data['Measure name'] == "Violent crime rate")],
+                        geojson=counties,
+                        locations='State',
+                        locationmode="USA-states",
+                        color='Raw value',
+                            color_continuous_scale="turbo",
+                            range_color=(0, 800),
+                            scope="usa",
+                                title='<b>Violent Crime Rates',
+                            labels={'Raw value':'Rate'},
+                                hover_name = 'State',
+                        animation_frame="Year span"
+                            )
+    fig.update_layout(margin={"r":0,"t":45,"l":0,"b":0},
+                    height=600,
+                    width=700)
+    # Adjust map geo options
+    fig.update_geos(showcountries=False, showcoastlines=True
+                    )
+    fig["layout"].pop("updatemenus")
+
+    fig.write_html(outfile, include_plotlyjs='cdn', full_html=False)
 
 
 if __name__ == "__main__":
     state_data = clean(raw_data)
 
-    plot_data(state_data, "index.html")
+    plot_unemployment(state_data, "unemployment.html")
+    plot_crime(state_data, "crime.html")
